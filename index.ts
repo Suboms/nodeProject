@@ -2,6 +2,7 @@ import { connection } from "./db/dbServer";
 import { User, AccountDetails, Transaction, Statement } from "./models/Models";
 import express from "express";
 import { expressApp } from "./app"; 
+import { TransactionDetails } from "./controllers/transactionControllers";
 
 const app = express();
 
@@ -34,7 +35,7 @@ Statement.belongsTo(AccountDetails, {
 const dbServer = async () => {
   try {
     await connection.authenticate();
-    await connection.sync({ force: true }); 
+    await connection.sync({ alter: true }); 
     console.log("Database & tables created!");
   } catch (error) {
     console.error("Error creating database & tables:", error);
@@ -51,6 +52,7 @@ const server = async () => {
   } catch (error:any) {
     console.error("Error starting the server:", error.message); 
   }
+  // await TransactionDetails();
 };
 
 server();

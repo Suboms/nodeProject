@@ -1,7 +1,14 @@
 import { DataTypes, Model } from "sequelize";
 import { connection } from "../db/dbServer";
 
-class User extends Model {}
+class User extends Model {
+  public id!: number;
+  public email!: string;
+  public firstName!: string;
+  public lastName!: string;
+  public userName!: string;
+  public password!: string;
+}
 class AccountDetails extends Model {}
 class Transaction extends Model {}
 class Statement extends Model {}
@@ -32,7 +39,7 @@ User.init(
     },
   },
   {
-    sequelize: connection, 
+    sequelize: connection,
     modelName: "User",
     tableName: "Users",
   }
@@ -45,12 +52,12 @@ AccountDetails.init(
       allowNull: false,
       unique: true,
       references: {
-        model: "Users", 
+        model: "Users",
         key: "id",
       },
     },
     accountNum: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       allowNull: false,
       unique: true,
     },
@@ -60,7 +67,7 @@ AccountDetails.init(
     },
   },
   {
-    sequelize: connection, 
+    sequelize: connection,
     modelName: "AccountDetails",
     tableName: "AccountDetails",
   }
@@ -83,6 +90,10 @@ Transaction.init(
     },
     transactionAmount: {
       type: DataTypes.DECIMAL(15, 2),
+      allowNull: false,
+    },
+    transactionDestination: {
+      type: DataTypes.BIGINT,
       allowNull: false,
     },
     description: {

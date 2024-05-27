@@ -1,17 +1,19 @@
-import { User } from "../models/Models";
+import { User, AccountDetails } from "../models/Models";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 const Signup = async (req: Request, res: Response) => {
+  const minaccountNum = 5e9;
+  const maxaccountNum = 6e9 - 1;
+  
   try {
     const { email, firstName, lastName, userName, password } = req.body;
-    console.log("user data", req.body);
-    
+
     if (!email || !firstName || !lastName || !userName || !password) {
-      console.log("user data", req.body);
       return res.status(400).json({ message: "All fields are required" });
     }
-    console.log("user data", req.body)
 
     const isUser = await User.findOne({ where: { email } });
     if (isUser) {
@@ -26,10 +28,52 @@ const Signup = async (req: Request, res: Response) => {
       userName,
       password: hashedPassword,
     });
-    return res.status(201).json(newUser);
+    const newAccount = await AccountDetails.create({
+      userId: newUser.id,
+      accountNum: BigInt(
+        Math.floor(
+          minaccountNum + Math.random() * (maxaccountNum - minaccountNum + 1)
+        )
+      ).toString(),
+      accountBalance: 0,
+    });
+    return res.status(201).json({ user: newUser, account: newAccount });
   } catch (error: any) {
-    console.error('Error during signup:', error);  
     return res.status(500).json({ message: error.message });
   }
 };
-export { Signup };
+
+const Login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(400).json({ message: "User does not exist" });
+    }
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+    const payload = {
+      id: user.id,
+      email: user.email,
+      userName: user.userName,
+    };
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET!, {
+      expiresIn: "10h",
+    });
+    const refreshToken = jwt.sign(payload, process.env.JWT_SECRET!, {
+      expiresIn: "365d",
+    });
+    return res.status(200).json({ accessToken, refreshToken });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export { Signup, Login };
