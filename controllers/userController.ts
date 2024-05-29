@@ -3,17 +3,32 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+import { log } from "console";
 
 const Signup = async (req: Request, res: Response) => {
   const minaccountNum = 5e9;
   const maxaccountNum = 6e9 - 1;
-  
+
   try {
     const { email, firstName, lastName, userName, password } = req.body;
 
-    if (!email || !firstName || !lastName || !userName || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+    const missingFields = [];
+
+    if (!email) missingFields.push("email");
+    if (!firstName) missingFields.push("firstName");
+    if (!lastName) missingFields.push("lastName");
+    if (!userName) missingFields.push("userName");
+    if (!password) missingFields.push("password");
+
+    if (missingFields.length > 0) {
+      return res
+        .status(400)
+        .json({
+          message: "The following fields are required",
+          missingFields: missingFields,
+        });
     }
+
 
     const isUser = await User.findOne({ where: { email } });
     if (isUser) {
@@ -53,7 +68,7 @@ const Login = async (req: Request, res: Response) => {
 
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(400).json({ message: "User does not exist" });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {

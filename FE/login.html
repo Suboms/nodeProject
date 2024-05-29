@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form id="loginTestForm">
+      <label for="email">Email:</label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        placeholder="Enter your email" />
+
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        name="password"
+        id="phone"
+        placeholder="Enter your pword" />
+
+      <input type="submit" value="Submit" />
+    </form>
+
+    <script>
+      const loginForm = document.getElementById("loginTestForm");
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(loginForm);
+        const jsonData = Object.fromEntries(formData.entries());
+        const response = await fetch("http://localhost:3500/api/login", {
+          method: "post",
+          body: JSON.stringify(jsonData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+        console.log(data);
+        if (response.status === 200) {
+          localStorage.setItem("access", data.accessToken);
+          localStorage.setItem("refresh", data.refreshToken);
+          window.location.href = "index.html"
+        }
+        
+      });
+    </script>
+  </body>
+</html>

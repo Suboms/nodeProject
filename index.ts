@@ -46,8 +46,8 @@ const server = async () => {
   try {
     expressApp(app); 
     await dbServer();
-    app.listen(5050, () => {
-      console.log("Hive Server has Started");
+    app.listen(process.env.PORT, () => {
+      console.log(`Hive Server has Started at http://localhost:${process.env.PORT}` );
     });
   } catch (error:any) {
     console.error("Error starting the server:", error.message); 
