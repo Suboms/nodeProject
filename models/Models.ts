@@ -89,11 +89,15 @@ Transaction.init(
       allowNull: false,
     },
     transactionAmount: {
-      type: DataTypes.DECIMAL(15, 2),
+      type: DataTypes.DECIMAL(17, 2),
       allowNull: false,
     },
     transactionDestination: {
       type: DataTypes.BIGINT,
+      allowNull: false,
+    },
+    destinationBank: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     description: {
@@ -122,14 +126,6 @@ Statement.init(
         model: AccountDetails,
         key: "id",
       },
-    },
-    startDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    endDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
     },
     generatedAt: {
       type: DataTypes.DATE,

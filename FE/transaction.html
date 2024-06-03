@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Send Money</h1>
+    <form id="transactionTestform">
+      <label for="amountSent">Enter amount</label>
+      <input type="text" name="transactionAmount" id="amountSent" />
+
+      <label for="destination">Destination Account Number </label>
+      <input type="text" name="transactionDestination" id="destination" />
+
+      <label for="bankDes">Bank Destination</label>
+      <input type="text" name="destinationBank" id="bankDes" />
+
+      <label for="description">Description</label>
+      <textarea type="text" name="description" id="description"></textarea>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <script>
+      const getToken = () => {
+        return localStorage.getItem("refreshToken");
+      };
+
+      // const transactionForm = document.getElementById("transactionTestform");
+      // transactionForm.addEventListener("submit", async (e) => {
+      //   e.preventDefault();
+      //   const formData = new FormData(transactionForm);
+      //   const jsonData = Object.fromEntries(formData.entries());
+
+      //   if (jsonData.transactionAmount){
+      //     jsonData.transactionAmount = parseFloat(jsonData.transactionAmount);
+      //   }
+
+      //   console.log(jsonData);
+      //   const response = await fetch("http://localhost:3500/api/transaction", {
+      //     method: "post",
+      //     body: JSON.stringify(jsonData),
+      //     headers: {
+      //       Authorization: `Bearer ${getToken()}`,
+      //       "Content-Type": "application/json"
+      //     },
+      //   });
+      //   const data = await response.json();
+      //   console.log(data);
+      // });
+
+      const transactionForm = document.getElementById("transactionTestform");
+      transactionForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(transactionForm);
+        const jsonData = Object.fromEntries(formData.entries());
+
+        // Convert specific form entry to a number
+        if (jsonData.transactionAmount) {
+          jsonData.transactionAmount = parseFloat(
+            jsonData.transactionAmount
+          ).toFixed(2); // Ensuring 2 decimal places
+        }
+
+        if (jsonData.transactionDestination) {
+          jsonData.transactionDestination = parseInt(
+            jsonData.transactionDestination
+          );
+        }
+
+        console.log(jsonData); // Log the form data to debug
+
+        const response = await fetch("http://localhost:3500/api/transaction", {
+          method: "post",
+          body: JSON.stringify(jsonData),
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await response.json();
+        console.log(data);
+      });
+    </script>
+  </body>
+</html>

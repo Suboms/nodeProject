@@ -35,7 +35,7 @@ Statement.belongsTo(AccountDetails, {
 const dbServer = async () => {
   try {
     await connection.authenticate();
-    await connection.sync({ alter: true }); 
+    await connection.sync({ force: true }); 
     console.log("Database & tables created!");
   } catch (error) {
     console.error("Error creating database & tables:", error);

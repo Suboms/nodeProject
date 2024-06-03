@@ -1,13 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-</head>
-<body>
-    <button type="button">
-        <a href="/FE/signup.html">Signup</a>
+  </head>
+  <body>
+    <button type="button" id="signupButton">
+      <a href="/FE/signup.html">Signup</a>
     </button>
-</body>
+    <button type="button" id="transactionButton" style="display: none">
+      <a href="/FE/transaction.html">Transact</a>
+    </button>
+
+    <script>
+      const getUser = async () => {
+        const signupButton = document.getElementById("signupButton");
+        const transactionButton = document.getElementById("transactionButton");
+        const accessToken = localStorage.getItem("accessToken");
+        const refreshToken = localStorage.getItem("refreshToken");
+        if (!accessToken || !refreshToken) {
+          window.location.href = "login.html";
+        } else {
+          signupButton.style.display = "none";
+          transactionButton.style.display = "block";
+        }
+        const response = await fetch("http://localhost:3500/api/userprofile", {
+          method: "get",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const data = await response.json();
+        if (response.status === 401) {
+          window.location.href = "login.html";
+          return;
+        }
+        return data;
+      };
+      getUser();
+
+      const useData = async () => {
+        const userData = await getUser();
+        console.log(userData);
+        const nameHeader = document.createElement("h1");
+        const balance = document.createElement("p");
+        nameHeader.textContent = userData.user.email;
+        balance.textContent = `$${userData.userAccount.accountBalance}`;
+        document.body.prepend(nameHeader, balance);
+      };
+      useData();
+    </script>
+  </body>
 </html>

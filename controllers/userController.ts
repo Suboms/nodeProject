@@ -1,9 +1,8 @@
 import { User, AccountDetails } from "../models/Models";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import "dotenv/config";
-import { log } from "console";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 const Signup = async (req: Request, res: Response) => {
   const minaccountNum = 5e9;
@@ -21,14 +20,11 @@ const Signup = async (req: Request, res: Response) => {
     if (!password) missingFields.push("password");
 
     if (missingFields.length > 0) {
-      return res
-        .status(400)
-        .json({
-          message: "The following fields are required",
-          missingFields: missingFields,
-        });
+      return res.status(400).json({
+        message: "The following fields are required",
+        missingFields: missingFields,
+      });
     }
-
 
     const isUser = await User.findOne({ where: { email } });
     if (isUser) {
@@ -50,7 +46,7 @@ const Signup = async (req: Request, res: Response) => {
           minaccountNum + Math.random() * (maxaccountNum - minaccountNum + 1)
         )
       ).toString(),
-      accountBalance: 0,
+      accountBalance: 200000000
     });
     return res.status(201).json({ user: newUser, account: newAccount });
   } catch (error: any) {
@@ -91,4 +87,34 @@ const Login = async (req: Request, res: Response) => {
   }
 };
 
-export { Signup, Login };
+const userProfile = async (req: Request, res: Response) => {
+  try {
+    const accessToken = req.headers.authorization as string | undefined;
+    if (!accessToken) {
+      return res.status(401).json({ error: "Access token is missing" });
+    }
+
+    const token = accessToken.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ error: "Token is missing" });
+    }
+    const decodedToken: JwtPayload = jwt.verify(
+      token!,
+      process.env.JWT_SECRET!
+    ) as JwtPayload;
+    const { email } = decodedToken;
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({ error: "User does not exist" });
+    }
+    const userAccount = await AccountDetails.findOne({
+      where: { userId: user.id },
+    });
+    return res.status(200).json({ user, userAccount });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export { Signup, Login, userProfile};
