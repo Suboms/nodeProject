@@ -1,4 +1,4 @@
-import { User, AccountDetails } from "../models/Models";
+import { User, AccountDetails } from "../model/Models";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import "dotenv/config";
@@ -46,7 +46,7 @@ const Signup = async (req: Request, res: Response) => {
           minaccountNum + Math.random() * (maxaccountNum - minaccountNum + 1)
         )
       ).toString(),
-      accountBalance: 200000000
+      accountBalance: 200000000,
     });
     return res.status(201).json({ user: newUser, account: newAccount });
   } catch (error: any) {
@@ -76,7 +76,7 @@ const Login = async (req: Request, res: Response) => {
       userName: user.userName,
     };
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET!, {
-      expiresIn: "10h",
+      expiresIn: 300,
     });
     const refreshToken = jwt.sign(payload, process.env.JWT_SECRET!, {
       expiresIn: "365d",
@@ -95,14 +95,17 @@ const userProfile = async (req: Request, res: Response) => {
     }
 
     const token = accessToken.split(" ")[1];
-    if (!token) {
+
+    if (!token || token === "null") {
       return res.status(401).json({ error: "Token is missing" });
     }
-    const decodedToken: JwtPayload = jwt.verify(
-      token!,
-      process.env.JWT_SECRET!
-    ) as JwtPayload;
-    const { email } = decodedToken;
+    let decodedToken: JwtPayload;
+    try {
+      decodedToken = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    } catch (err) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+    const { email } = decodedToken as unknown as { email: string };
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
@@ -113,8 +116,8 @@ const userProfile = async (req: Request, res: Response) => {
     });
     return res.status(200).json({ user, userAccount });
   } catch (error: any) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
-export { Signup, Login, userProfile};
+export { Signup, Login, userProfile };

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { User, Statement } from "../models/Models";
+import { User, Statement } from "../model/Models";
 
 const StatementDetail = async (req: Request, res: Response) => {
   try {
@@ -25,10 +25,14 @@ const StatementDetail = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "User does not exist" });
     }
 
-    const userStatement = await Statement.findAll({where:{accountId:user.id}})
+    const userStatement = await Statement.findAll({
+      where: { accountId: user.id },
+    });
 
-    return res.status(200).json({message:userStatement})
-  } catch (error: any) {}
+    return res.status(200).json({ message: userStatement });
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
 };
 
-export {StatementDetail}
+export { StatementDetail };

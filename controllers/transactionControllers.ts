@@ -1,4 +1,4 @@
-import { User, AccountDetails, Transaction, Statement } from "../models/Models";
+import { User, AccountDetails, Transaction, Statement } from "../model/Models";
 import { Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import Decimal from "decimal.js";
@@ -119,7 +119,9 @@ const TransactionDetails = async (
     });
 
     // Update receiver's account balance
-    const newDestinationBal = new Decimal(destinationAccountExists.dataValues.accountBalance)
+    const newDestinationBal = new Decimal(
+      destinationAccountExists.dataValues.accountBalance
+    )
       .plus(parsedTransactionAmount)
       .toFixed(2);
 
@@ -136,6 +138,7 @@ const TransactionDetails = async (
       description,
       transactionDate: date.toISOString(),
       transactionType: transactionTypeSender,
+      accountBalance: newBal.toFixed(2),
     };
 
     await Statement.create({
@@ -151,6 +154,7 @@ const TransactionDetails = async (
       description,
       transactionDate: date.toISOString(),
       transactionType: transactionTypeReceiver,
+      accountBalance: newDestinationBal,
     };
 
     await Statement.create({

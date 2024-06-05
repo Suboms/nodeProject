@@ -1,8 +1,6 @@
-import { connection } from "./db/dbServer"; 
-import { User, AccountDetails, Transaction, Statement } from "./models/Models";
+import { User, AccountDetails, Transaction, Statement } from "./model/Models";
 import express from "express";
 import { expressApp } from "./app"; 
-import { TransactionDetails } from "./controllers/transactionControllers";
 
 const app = express();
 
@@ -32,27 +30,18 @@ Statement.belongsTo(AccountDetails, {
 });
 
 
-const dbServer = async () => {
-  try {
-    await connection.authenticate();
-    await connection.sync({ force: true }); 
-    console.log("Database & tables created!");
-  } catch (error) {
-    console.error("Error creating database & tables:", error);
-  }
-};
+
 
 const server = async () => {
   try {
     expressApp(app); 
-    await dbServer();
     app.listen(process.env.PORT, () => {
-      console.log(`Hive Server has Started at http://localhost:${process.env.PORT}` );
+      console.log(`Hive Server has Started on ${process.env.PORT}` );
     });
   } catch (error:any) {
     console.error("Error starting the server:", error.message); 
   }
-  // await TransactionDetails();
+ 
 };
 
 server();

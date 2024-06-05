@@ -62,7 +62,7 @@ AccountDetails.init(
       unique: true,
     },
     accountBalance: {
-      type: DataTypes.DECIMAL(15, 2),
+      type: DataTypes.DECIMAL(17, 2),
       allowNull: false,
     },
   },
@@ -123,7 +123,7 @@ Statement.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: AccountDetails,
+        model: "AccountDetails",
         key: "id",
       },
     },
