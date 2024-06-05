@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.ts",
+    "start": "nodemon ./build/index.js",
+    "build":"npx tsc",
     "generate-models": "node generate-models.js",
     "create-db":"npx sequelize-cli db:migrate"
   },

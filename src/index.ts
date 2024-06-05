@@ -36,7 +36,7 @@ const server = async () => {
   try {
     expressApp(app); 
     app.listen(process.env.PORT, () => {
-      console.log(`Hive Server has Started on ${process.env.PORT}` );
+      console.log(`Bank server has started on ${process.env.PORT}` );
     });
   } catch (error:any) {
     console.error("Error starting the server:", error.message); 
