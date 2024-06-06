@@ -8,7 +8,7 @@
     "start": "nodemon ./build/index.js",
     "build":"npx tsc",
     "generate-models": "node generate-models.js",
-    "create-db":"npx sequelize-cli db:migrate"
+    "create-db":"npx sequelize-cli db:migrate --env production"
   },
   "keywords": [],
   "author": "",
